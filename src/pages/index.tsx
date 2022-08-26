@@ -13,7 +13,6 @@ const Home: NextPage = () => {
     event.preventDefault();
 
     const data = { email, password };
-
     await signIn(data);
   }
 
