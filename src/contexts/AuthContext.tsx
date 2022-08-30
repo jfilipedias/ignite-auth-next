@@ -38,7 +38,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     if (token) {
       api.get("/me").then((response) => {
-        const { email, permissions, roles } = response.data;
+        const { email, permissions, roles } = response?.data;
 
         setUser({ email, permissions, roles });
       });
