@@ -1,10 +1,11 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-import { setCookie, parseCookies } from "nookies";
+import { setCookie, parseCookies, destroyCookie } from "nookies";
 
 import Router from "next/router";
 
 import { api } from "../services/api";
+import { AxiosError } from "axios";
 
 interface User {
   email: string;
@@ -27,6 +28,13 @@ interface AuthProviderProps {
   children: React.ReactNode;
 }
 
+export const singOut = () => {
+  destroyCookie(undefined, "nextauth.token");
+  destroyCookie(undefined, "nextauth.refreshToken");
+
+  Router.push("/");
+};
+
 const AuthContext = createContext({} as AuthContextData);
 
 const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
@@ -37,11 +45,14 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const { "nextauth.token": token } = parseCookies();
 
     if (token) {
-      api.get("/me").then((response) => {
-        const { email, permissions, roles } = response?.data;
+      api
+        .get("/me")
+        .then((response) => {
+          const { email, permissions, roles } = response?.data;
 
-        setUser({ email, permissions, roles });
-      });
+          setUser({ email, permissions, roles });
+        })
+        .catch(() => singOut());
     }
   }, []);
 
