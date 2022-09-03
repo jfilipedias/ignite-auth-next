@@ -1,7 +1,8 @@
 import { FormEvent, useState } from "react";
-import type { NextPage } from "next";
+import type { GetServerSideProps, NextPage } from "next";
 
 import { useAuth } from "../contexts/AuthContext";
+import { parseCookies } from "nookies";
 
 const Home: NextPage = () => {
   const [email, setEmail] = useState("");
@@ -17,7 +18,7 @@ const Home: NextPage = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="container" onSubmit={handleSubmit}>
       <input
         type="email"
         value={email}
@@ -33,6 +34,23 @@ const Home: NextPage = () => {
       <button type="submit">Entrar</button>
     </form>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const cookies = parseCookies(ctx);
+
+  if (cookies["nextauth.token"]) {
+    return {
+      redirect: {
+        destination: "/dashboard",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {},
+  };
 };
 
 export default Home;
