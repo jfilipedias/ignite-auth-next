@@ -4,8 +4,7 @@ import { setCookie, parseCookies, destroyCookie } from "nookies";
 
 import Router from "next/router";
 
-import { api } from "../services/api";
-import { AxiosError } from "axios";
+import { api } from "../services/apiClient";
 
 interface User {
   email: string;

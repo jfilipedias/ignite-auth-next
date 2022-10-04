@@ -1,8 +1,7 @@
 import { FormEvent, useState } from "react";
-import type { GetServerSideProps, NextPage } from "next";
+import type { NextPage } from "next";
 
 import { useAuth } from "../contexts/AuthContext";
-import { parseCookies } from "nookies";
 import { withSSRGuest } from "../utils/withSSRGuest";
 
 const Home: NextPage = () => {
