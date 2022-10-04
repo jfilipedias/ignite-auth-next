@@ -1,20 +1,16 @@
 import { NextPage } from "next/types";
+import { Authorize } from "../components/Authorization";
 
 import { useAuth } from "../contexts/AuthContext";
-import { useAuthorization } from "../hooks/useAuthorization";
 import { withSSRAuth } from "../utils/withSSRAuth";
 
 const Dashboard: NextPage = () => {
   const { user } = useAuth();
 
-  const userCanSeeMetrics = useAuthorization({
-    permissions: ["metrics.list"],
-  });
-
   return (
     <>
       <h1>Dashboard: {user?.email}</h1>
-      {userCanSeeMetrics && <div>Metrics</div>}
+      <Authorize permissions={["metrics.list"]}>Metrics</Authorize>
     </>
   );
 };
