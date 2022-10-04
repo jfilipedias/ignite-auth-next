@@ -20,25 +20,43 @@ interface SignInCredentials {
 interface AuthContextData {
   isAuthenticated: boolean;
   user?: User;
-  signIn(credentials: SignInCredentials): Promise<void>;
+  signIn: (credentials: SignInCredentials) => Promise<void>;
+  signOut: () => void;
 }
 
 interface AuthProviderProps {
   children: React.ReactNode;
 }
 
-export const singOut = () => {
+const AuthContext = createContext({} as AuthContextData);
+
+let authChannel: BroadcastChannel;
+
+export const signOut = () => {
   destroyCookie(undefined, "nextauth.token");
   destroyCookie(undefined, "nextauth.refreshToken");
+
+  authChannel.postMessage("signOut");
 
   Router.push("/");
 };
 
-const AuthContext = createContext({} as AuthContextData);
-
 const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User>();
   const isAuthenticated = !!user;
+
+  useEffect(() => {
+    authChannel = new BroadcastChannel("auth");
+    authChannel.onmessage = (message) => {
+      switch (message.data) {
+        case "signOut":
+          Router.push("/");
+          break;
+        default:
+          break;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const { "nextauth.token": token } = parseCookies();
@@ -51,7 +69,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
           setUser({ email, permissions, roles });
         })
-        .catch(() => singOut());
+        .catch(() => signOut());
     }
   }, []);
 
@@ -82,7 +100,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, signIn }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

@@ -5,11 +5,14 @@ import { useAuth } from "../contexts/AuthContext";
 import { withSSRAuth } from "../utils/withSSRAuth";
 
 const Dashboard: NextPage = () => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
 
   return (
     <>
       <h1>Dashboard: {user?.email}</h1>
+
+      <button onClick={signOut}>Sign out</button>
+
       <Authorize permissions={["metrics.list"]}>Metrics</Authorize>
     </>
   );
