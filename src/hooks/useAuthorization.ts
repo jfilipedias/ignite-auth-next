@@ -1,5 +1,6 @@
-import { useContext } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { validateUserPermissions } from "../utils/validateUserPermissions";
+import { validateUserRoles } from "../utils/validateUserRoles";
 
 type UseAuthorizationParams = {
   permissions?: string[];
@@ -16,25 +17,9 @@ export function useAuthorization({
     return false;
   }
 
-  if (permissions?.length > 0) {
-    const hasAllPermissions = permissions.every((permission) => {
-      return user?.permissions.includes(permission);
-    });
+  const userHasAuthorization =
+    validateUserPermissions({ user, permissions }) &&
+    validateUserRoles({ user, roles });
 
-    if (!hasAllPermissions) {
-      return false;
-    }
-  }
-
-  if (roles?.length > 0) {
-    const hasAllRoles = roles.every((role) => {
-      return user?.roles.includes(role);
-    });
-
-    if (!hasAllRoles) {
-      return false;
-    }
-  }
-
-  return true;
+  return userHasAuthorization;
 }
